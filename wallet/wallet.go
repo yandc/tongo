@@ -100,6 +100,23 @@ func New(key ed25519.PrivateKey, ver Version, blockchain blockchain, opts ...Opt
 	}, nil
 }
 
+func DefaultWalletFromPub(key ed25519.PublicKey) (Wallet, error) {
+	w, err := newWallet(key, V4R2, Options{})
+	if err != nil {
+		return Wallet{}, err
+	}
+	address, err := w.generateAddress()
+	if err != nil {
+		return Wallet{}, fmt.Errorf("can not generate wallet address: %v", err)
+	}
+	return Wallet{
+		address:    address,
+		ver:        V4R2,
+		intWallet:  w,
+		blockchain: nil,
+	}, nil
+}
+
 func newWallet(key ed25519.PublicKey, version Version, options Options) (wallet, error) {
 	switch version {
 	case V1R1, V1R2, V1R3, V2R1, V2R2:

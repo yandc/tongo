@@ -28,6 +28,7 @@ type Jetton struct {
 
 type TransferMessage struct {
 	Jetton              *Jetton
+	JettonWallet        *ton.AccountID
 	Sender              ton.AccountID
 	JettonAmount        *big.Int
 	Destination         ton.AccountID
@@ -62,13 +63,10 @@ func (tm TransferMessage) ToInternal() (tlb.Message, uint8, error) {
 	if err := tlb.Marshal(c, msgBody); err != nil {
 		return tlb.Message{}, 0, err
 	}
-	jettonWallet, err := tm.Jetton.GetJettonWallet(context.TODO(), tm.Sender)
-	if err != nil {
-		return tlb.Message{}, 0, err
-	}
+
 	m := wallet.Message{
 		Amount:  tm.AttachedTon,
-		Address: jettonWallet,
+		Address: *tm.JettonWallet,
 		Bounce:  true,
 		Mode:    wallet.DefaultMessageMode,
 		Body:    c,
