@@ -5,7 +5,6 @@ import (
 	"errors"
 	"math/big"
 	"strconv"
-	"time"
 
 	"github.com/tonkeeper/tongo/abi"
 	"github.com/tonkeeper/tongo/boc"
@@ -37,13 +36,14 @@ type TransferMessage struct {
 	ForwardTonAmount    tlb.Grams
 	ForwardPayload      *boc.Cell
 	CustomPayload       *boc.Cell
+	QueryId             uint64
 }
 
 func (tm TransferMessage) ToInternal() (tlb.Message, uint8, error) {
 	c := boc.NewCell()
 	forwardTon := big.NewInt(int64(tm.ForwardTonAmount))
 	msgBody := abi.JettonTransferMsgBody{
-		QueryId:             uint64(time.Now().UnixNano()),
+		QueryId:             tm.QueryId,
 		Amount:              tlb.VarUInteger16(*tm.JettonAmount),
 		Destination:         tm.Destination.ToMsgAddress(),
 		ResponseDestination: tm.ResponseDestination.ToMsgAddress(),

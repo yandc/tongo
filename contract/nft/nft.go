@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"math/big"
-	"time"
 
 	"github.com/tonkeeper/tongo/abi"
 	"github.com/tonkeeper/tongo/boc"
@@ -46,13 +45,14 @@ type ItemTransferMessage struct {
 	ForwardTon          tlb.Grams
 	ForwardPayload      *boc.Cell
 	CustomPayload       *boc.Cell
+	QueryId             uint64
 }
 
 func (itm ItemTransferMessage) ToInternal() (tlb.Message, byte, error) {
 	c := boc.NewCell()
 	forwardTon := big.NewInt(int64(itm.ForwardTon))
 	msgBody := abi.NftTransferMsgBody{
-		QueryId:             uint64(time.Now().UnixNano()),
+		QueryId:             itm.QueryId,
 		NewOwner:            itm.Destination.ToMsgAddress(),
 		ResponseDestination: itm.ResponseDestination.ToMsgAddress(),
 		ForwardAmount:       tlb.VarUInteger16(*forwardTon),
